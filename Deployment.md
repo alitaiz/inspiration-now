@@ -62,9 +62,9 @@ Chúng ta cần Git để lấy mã nguồn từ GitHub và Nginx để phục v
     Thay `<your_github_repo_url>` bằng URL kho chứa của bạn. **Lưu ý dấu `.` ở cuối lệnh** để clone vào thư mục hiện tại.
     ```bash
     cd /var/www/inspiration-app
-    git clone <your_github_repo_url> .
+    sudo git clone <your_github_repo_url> .
     ```
-    *Nếu bạn đã clone trước đó, hãy dùng `git pull` để cập nhật và đảm bảo thư mục không trống.*
+    *Nếu bạn đã clone trước đó, hãy dùng `sudo git pull` để cập nhật và đảm bảo thư mục không trống.*
 
 3.  **Thiết lập quyền sở hữu và quyền truy cập:**
     Lệnh này cấp quyền cho Nginx (người dùng `www-data`) để đọc các file.
@@ -156,10 +156,21 @@ Bạn sẽ thấy ứng dụng "Inspiration Now" của mình đang chạy trực
 
 ### Xử lý sự cố (Troubleshooting)
 
-*   **Vẫn gặp lỗi 403 Forbidden?**
+*   **Gặp lỗi 403 Forbidden?**
     1.  Đảm bảo bạn đã chạy đúng các lệnh `chown` và `chmod` ở Bước 3.
     2.  Kiểm tra xem file `index.html` có thực sự tồn tại trong `/var/www/inspiration-app` không bằng lệnh: `ls -l /var/www/inspiration-app`. Bạn phải thấy file `index.html` trong danh sách. Nếu nó nằm trong một thư mục con, cấu hình `root` của Nginx đã sai.
-*   **Trang không tải được?**
+
+*   **Thấy một trang trắng tinh (Blank Page)?**
+    Đây là một vấn đề phổ biến khi triển khai các ứng dụng JavaScript hiện đại mà không có bước "build".
+    1.  **Vấn đề:** Trình duyệt không thể tự đọc cú pháp của React (JSX) và TypeScript (.tsx). Nó cần mã JavaScript thuần túy.
+    2.  **Giải pháp:** Chúng ta đã thêm một công cụ gọi là **Babel** vào file `index.html`. Công cụ này sẽ tự động dịch mã JSX/TSX thành JavaScript mà trình duyệt có thể hiểu được ngay khi bạn tải trang. Chúng ta cũng đã cập nhật các câu lệnh `import` để bao gồm phần mở rộng của file (ví dụ: `App.tsx` thay vì `App`), điều này là cần thiết để trình duyệt tìm đúng file.
+    3.  **Kiểm tra:** Đảm bảo bạn đã kéo phiên bản mã nguồn mới nhất có chứa những thay đổi này. Sau đó, hãy thử xóa bộ nhớ cache của trình duyệt và tải lại trang.
+
+*   **Trang vẫn không tải được?**
     1.  Kiểm tra lại trạng thái của Nginx: `sudo systemctl status nginx`.
     2.  Kiểm tra trạng thái firewall: `sudo ufw status`.
-    3.  Kiểm tra xem có dịch vụ nào khác đang dùng cổng `8000` không: `sudo lsof -i :8000`.
+    3.  Kiểm tra nhật ký lỗi của Nginx để xem có lỗi nào không (ví dụ: file not found - 404):
+        ```bash
+        tail -f /var/log/nginx/error.log
+        ```
+    4.  Kiểm tra xem có dịch vụ nào khác đang dùng cổng `8000` không: `sudo lsof -i :8000`.

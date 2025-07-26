@@ -1,12 +1,12 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { fetchNewInspiration } from './services/geminiService';
-import type { InspirationData } from './types';
-import QuoteCard from './components/QuoteCard';
-import LoadingSpinner from './components/LoadingSpinner';
-import ErrorDisplay from './components/ErrorDisplay';
-import { ExternalLinkIcon } from './components/Icons';
-import { generateRandomGradient } from './utils/backgroundUtils';
+import { fetchNewInspiration } from './services/geminiService.ts';
+import type { InspirationData } from './types.ts';
+import QuoteCard from './components/QuoteCard.tsx';
+import LoadingSpinner from './components/LoadingSpinner.tsx';
+import ErrorDisplay from './components/ErrorDisplay.tsx';
+import { ExternalLinkIcon } from './components/Icons.tsx';
+import { generateRandomGradient } from './utils/backgroundUtils.ts';
 
 const App: React.FC = () => {
   const [inspiration, setInspiration] = useState<InspirationData | null>(null);

@@ -1,5 +1,5 @@
-import type { InspirationData } from "../types";
-import { localQuotes } from "../data/quotes";
+import type { InspirationData } from "../types.ts";
+import { localQuotes } from "../data/quotes.ts";
 
 let lastQuoteIndex = -1;
 
