@@ -1,7 +1,8 @@
-
 # Hướng dẫn triển khai ứng dụng Inspiration Now
 
 Tài liệu này hướng dẫn cách triển khai ứng dụng React tĩnh (Inspiration Now) lên một máy chủ ảo (VPS) chạy hệ điều hành Ubuntu, sử dụng Nginx làm web server. Ứng dụng sẽ được truy cập qua cổng `8000`.
+
+Lỗi "403 Forbidden" thường xảy ra do Nginx không có quyền đọc các file trong thư mục gốc. Hướng dẫn này đã được cập nhật để khắc phục vấn đề đó.
 
 ## Yêu cầu
 1.  Một VPS đang chạy Ubuntu (22.04, 24.04 hoặc tương tự).
@@ -34,7 +35,13 @@ Chúng ta cần Git để lấy mã nguồn từ GitHub và Nginx để phục v
     sudo apt install git nginx -y
     ```
 
-3.  **Kiểm tra trạng thái Nginx để đảm bảo nó đang chạy:**
+3.  **Khởi động và kích hoạt Nginx:**
+    ```bash
+    sudo systemctl start nginx
+    sudo systemctl enable nginx
+    ```
+
+4.  **Kiểm tra trạng thái Nginx để đảm bảo nó đang chạy:**
     ```bash
     sudo systemctl status nginx
     ```
@@ -42,25 +49,28 @@ Chúng ta cần Git để lấy mã nguồn từ GitHub và Nginx để phục v
 
 ---
 
-### Bước 3: Clone mã nguồn từ GitHub
+### Bước 3: Tải mã nguồn và Cài đặt Quyền
 
-1.  **Tạo thư mục chứa ứng dụng:**
-    Chúng ta sẽ đặt các file trong thư mục `/var/www/`.
+Đây là bước quan trọng nhất để tránh lỗi "403 Forbidden".
+
+1.  **Tạo thư mục gốc cho ứng dụng:**
     ```bash
     sudo mkdir -p /var/www/inspiration-app
     ```
 
-2.  **Thay đổi quyền sở hữu thư mục:**
-    Điều này cho phép bạn clone mã nguồn mà không cần dùng `sudo`.
-    ```bash
-    sudo chown -R $USER:$USER /var/www/inspiration-app
-    ```
-
-3.  **Điều hướng tới thư mục và clone dự án:**
-    Thay `<your_github_repo_url>` bằng URL kho chứa của bạn. Dấu `.` ở cuối lệnh để clone vào thư mục hiện tại.
+2.  **Clone mã nguồn từ GitHub:**
+    Thay `<your_github_repo_url>` bằng URL kho chứa của bạn. **Lưu ý dấu `.` ở cuối lệnh** để clone vào thư mục hiện tại.
     ```bash
     cd /var/www/inspiration-app
     git clone <your_github_repo_url> .
+    ```
+    *Nếu bạn đã clone trước đó, hãy dùng `git pull` để cập nhật và đảm bảo thư mục không trống.*
+
+3.  **Thiết lập quyền sở hữu và quyền truy cập:**
+    Lệnh này cấp quyền cho Nginx (người dùng `www-data`) để đọc các file.
+    ```bash
+    sudo chown -R $USER:www-data /var/www/inspiration-app
+    sudo chmod -R 755 /var/www/inspiration-app
     ```
 
 ---
@@ -89,7 +99,6 @@ Chúng ta sẽ tạo một "server block" để Nginx biết cách phục vụ �
         server_name _;
 
         location / {
-            # Cố gắng phục vụ file được yêu cầu, nếu không tìm thấy, trả về index.html
             try_files $uri $uri/ /index.html;
         }
     }
@@ -97,6 +106,7 @@ Chúng ta sẽ tạo một "server block" để Nginx biết cách phục vụ �
     Nhấn `Ctrl + X`, sau đó `Y`, và `Enter` để lưu và thoát.
 
 3.  **Kích hoạt cấu hình bằng cách tạo một liên kết tượng trưng:**
+    *Lưu ý: Nếu file đã tồn tại, lệnh này sẽ báo lỗi. Bạn có thể bỏ qua nếu đã làm trước đó.*
     ```bash
     sudo ln -s /etc/nginx/sites-available/inspiration-app /etc/nginx/sites-enabled/
     ```
@@ -123,7 +133,12 @@ Cuối cùng, cho phép firewall (UFW) của Ubuntu chấp nhận các kết n�
     sudo ufw allow 8000/tcp
     ```
 
-2.  **(Tùy chọn) Kiểm tra trạng thái firewall:**
+2.  **(Tùy chọn) Kích hoạt Firewall nếu chưa bật:**
+    ```bash
+    sudo ufw enable
+    ```
+
+3.  **Kiểm tra trạng thái firewall:**
     ```bash
     sudo ufw status
     ```
@@ -138,3 +153,13 @@ Mở trình duyệt web của bạn và truy cập vào địa chỉ sau:
 `http://your_vps_ip:8000`
 
 Bạn sẽ thấy ứng dụng "Inspiration Now" của mình đang chạy trực tiếp từ VPS.
+
+### Xử lý sự cố (Troubleshooting)
+
+*   **Vẫn gặp lỗi 403 Forbidden?**
+    1.  Đảm bảo bạn đã chạy đúng các lệnh `chown` và `chmod` ở Bước 3.
+    2.  Kiểm tra xem file `index.html` có thực sự tồn tại trong `/var/www/inspiration-app` không bằng lệnh: `ls -l /var/www/inspiration-app`. Bạn phải thấy file `index.html` trong danh sách. Nếu nó nằm trong một thư mục con, cấu hình `root` của Nginx đã sai.
+*   **Trang không tải được?**
+    1.  Kiểm tra lại trạng thái của Nginx: `sudo systemctl status nginx`.
+    2.  Kiểm tra trạng thái firewall: `sudo ufw status`.
+    3.  Kiểm tra xem có dịch vụ nào khác đang dùng cổng `8000` không: `sudo lsof -i :8000`.
