@@ -45,7 +45,25 @@ const generateRandomGradient = (): string => {
 
 // --- SERVICES ---
 const fetchNewInspiration = async (): Promise<InspirationData> => {
-  const randomQuoteIndex = Math.floor(Math.random() * localQuotes.length);
+  const counts: Record<string, number> = JSON.parse(
+    localStorage.getItem('quoteCounts') ?? '{}'
+  );
+
+  const weights = localQuotes.map((_, idx) => 1 / (1 + (counts[idx] || 0)));
+  const total = weights.reduce((a, b) => a + b, 0);
+  let r = Math.random() * total;
+  let randomQuoteIndex = 0;
+  for (let i = 0; i < weights.length; i++) {
+    r -= weights[i];
+    if (r <= 0) {
+      randomQuoteIndex = i;
+      break;
+    }
+  }
+
+  counts[randomQuoteIndex] = (counts[randomQuoteIndex] || 0) + 1;
+  localStorage.setItem('quoteCounts', JSON.stringify(counts));
+
   const { quote } = localQuotes[randomQuoteIndex];
 
   let imageUrl: string;
