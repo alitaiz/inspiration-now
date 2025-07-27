@@ -106,7 +106,9 @@ const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ message }) => {
 };
 
 
+
 const QuoteCard: React.FC<QuoteCardProps> = ({ quote, imageUrl, onRefresh }) => {
+
 
   const getFontSizeClass = (textLength: number): string => {
     if (textLength > 220) return 'text-xl';
