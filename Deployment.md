@@ -161,16 +161,11 @@ Bạn sẽ thấy ứng dụng "Inspiration Now" của mình đang chạy trực
     2.  Kiểm tra xem file `index.html` có thực sự tồn tại trong `/var/www/inspiration-app` không bằng lệnh: `ls -l /var/www/inspiration-app`. Bạn phải thấy file `index.html` trong danh sách. Nếu nó nằm trong một thư mục con, cấu hình `root` của Nginx đã sai.
 
 *   **Thấy một trang trắng tinh (Blank Page)?**
-    Đây là một vấn đề phổ biến khi triển khai các ứng dụng JavaScript hiện đại mà không có bước "build".
     1.  **Vấn đề:** Trình duyệt không thể tự đọc cú pháp của React (JSX) và TypeScript (.tsx). Nó cần mã JavaScript thuần túy.
-    2.  **Giải pháp:** Chúng ta đã thêm một công cụ gọi là **Babel** vào file `index.html`. Công cụ này sẽ tự động dịch mã JSX/TSX thành JavaScript mà trình duyệt có thể hiểu được ngay khi bạn tải trang. Chúng ta cũng đã cập nhật các câu lệnh `import` để bao gồm phần mở rộng của file (ví dụ: `App.tsx` thay vì `App`), điều này là cần thiết để trình duyệt tìm đúng file.
-    3.  **Kiểm tra:** Đảm bảo bạn đã kéo phiên bản mã nguồn mới nhất có chứa những thay đổi này. Sau đó, hãy thử xóa bộ nhớ cache của trình duyệt và tải lại trang.
+    2.  **Giải pháp:** Chúng ta đã thêm **Babel** vào `index.html` để dịch mã ngay trên trình duyệt. Chúng ta cũng đã cập nhật các câu lệnh `import` để bao gồm phần mở rộng của file (ví dụ: `App.tsx` thay vì `App`), điều này là cần thiết để trình duyệt tìm đúng file.
+    3.  **Kiểm tra:** Đảm bảo bạn đã kéo phiên bản mã nguồn mới nhất. Sau đó, hãy thử xóa bộ nhớ cache của trình duyệt và tải lại trang.
 
 *   **Trang vẫn không tải được?**
     1.  Kiểm tra lại trạng thái của Nginx: `sudo systemctl status nginx`.
-    2.  Kiểm tra trạng thái firewall: `sudo ufw status`.
-    3.  Kiểm tra nhật ký lỗi của Nginx để xem có lỗi nào không (ví dụ: file not found - 404):
-        ```bash
-        tail -f /var/log/nginx/error.log
-        ```
-    4.  Kiểm tra xem có dịch vụ nào khác đang dùng cổng `8000` không: `sudo lsof -i :8000`.
+    2.  Kiểm tra nhật ký lỗi của Nginx: `tail -f /var/log/nginx/error.log`.
+    3.  Kiểm tra xem có dịch vụ nào khác đang dùng cổng `8000` không: `sudo lsof -i :8000`.

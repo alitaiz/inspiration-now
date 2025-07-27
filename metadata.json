@@ -1,5 +1,6 @@
 {
   "name": "Inspiration Now",
   "description": "Get a daily dose of inspiration with a new motivational quote and a beautiful background every time you visit.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [],
+  "prompt": ""
 }

@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { fetchNewInspiration } from './services/geminiService.ts';
 import type { InspirationData } from './types.ts';
 import QuoteCard from './components/QuoteCard.tsx';
@@ -14,9 +14,6 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [backgroundStyle, setBackgroundStyle] = useState<string>('');
   
-  const inspirationRef = useRef<InspirationData | null>(inspiration);
-  inspirationRef.current = inspiration;
-
   useEffect(() => {
     setBackgroundStyle(generateRandomGradient());
 
@@ -25,11 +22,10 @@ const App: React.FC = () => {
       setError(null);
       try {
         const data = await fetchNewInspiration();
-        if (inspirationRef.current?.imageUrl.startsWith('blob:')) {
-          URL.revokeObjectURL(inspirationRef.current.imageUrl);
-        }
         setInspiration(data);
       } catch (err) {
+        console.error("An unexpected error occurred while loading inspiration:", err);
+        // The service has fallbacks, but this catches anything else.
         setError(err instanceof Error ? err.message : 'An unknown error occurred');
         setInspiration(null);
       } finally {
@@ -39,11 +35,7 @@ const App: React.FC = () => {
     
     loadInspiration();
     
-    return () => {
-      if (inspirationRef.current?.imageUrl.startsWith('blob:')) {
-        URL.revokeObjectURL(inspirationRef.current.imageUrl);
-      }
-    };
+    // Cleanup is no longer necessary for data: URLs or https: URLs.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
