@@ -19,19 +19,19 @@
         animation: fadeIn 0.7s ease-in-out forwards;
       }
     </style>
-  <script type="importmap">
+<script type="importmap">
 {
   "imports": {
-    "react/": "https://esm.sh/react@^19.1.0/",
     "react": "https://esm.sh/react@^19.1.0",
-    "react-dom/": "https://esm.sh/react-dom@^19.1.0/"
+    "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
+    "react/": "https://esm.sh/react@^19.1.0/"
   }
 }
 </script>
 </head>
   <body class="bg-gray-100">
     <div id="root"></div>
-    <!-- The script is no longer a module, as it will use the global React/ReactDOM variables -->
+    <!-- This single script is transpiled by Babel and contains the entire application logic -->
     <script type="text/babel" data-presets="react,typescript" src="/index.tsx"></script>
   </body>
 </html>
