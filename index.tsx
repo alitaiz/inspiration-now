@@ -7,13 +7,11 @@ import { localQuotes } from './localQuotes.js'; // Quotes moved to a separate fi
 // --- TYPE DEFINITIONS ---
 interface InspirationData {
   quote: string;
-  author: string;
   imageUrl: string;
 }
 
 interface QuoteCardProps {
   quote: string;
-  author: string;
   imageUrl: string;
 }
 
@@ -47,7 +45,7 @@ const generateRandomGradient = (): string => {
 // --- SERVICES ---
 const fetchNewInspiration = async (): Promise<InspirationData> => {
   const randomQuoteIndex = Math.floor(Math.random() * localQuotes.length);
-  const { quote, author } = localQuotes[randomQuoteIndex];
+  const { quote } = localQuotes[randomQuoteIndex];
 
   let imageUrl: string;
 
@@ -63,7 +61,7 @@ const fetchNewInspiration = async (): Promise<InspirationData> => {
     imageUrl = localImages[randomImageIndex];
   }
 
-  return { quote, author, imageUrl };
+  return { quote, imageUrl };
 };
 
 // --- COMPONENTS ---
@@ -106,7 +104,7 @@ const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ message }) => {
   );
 };
 
-const QuoteCard: React.FC<QuoteCardProps> = ({ quote, author, imageUrl }) => {
+const QuoteCard: React.FC<QuoteCardProps> = ({ quote, imageUrl }) => {
   const getFontSizeClass = (textLength: number): string => {
     if (textLength > 220) return 'text-xl';
     if (textLength > 150) return 'text-2xl';
@@ -124,9 +122,7 @@ const QuoteCard: React.FC<QuoteCardProps> = ({ quote, author, imageUrl }) => {
         <p className={`text-white ${fontSizeClass} font-serif leading-relaxed drop-shadow-lg transition-all duration-300`}>
           "{quote}"
         </p>
-        <p className="text-white text-lg font-sans mt-4 opacity-80 drop-shadow-md">
-          - {author}
-        </p>
+        {/* Author removed per user request */}
       </div>
     </div>
   );
@@ -173,7 +169,6 @@ const App: React.FC = () => {
         <QuoteCard
           key={inspiration.imageUrl}
           quote={inspiration.quote}
-          author={inspiration.author}
           imageUrl={inspiration.imageUrl}
         />
       );
