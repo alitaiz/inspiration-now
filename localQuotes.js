@@ -312,5 +312,5 @@ export const localQuotes = [
   { quote: "Through gratitude, I stay mindful of the lessons learned along the way." },
   { quote: "My peaceful nature grows as I release old fears and judgments." },
   { quote: "I trust life’s rhythm, knowing every moment brings growth and wisdom." },
-  { quote: "Every encouraging thought I hold creates stronger confidence within." }
+  { quote: "Every encouraging thought I hold creates stronger confidence within." },
 ];
