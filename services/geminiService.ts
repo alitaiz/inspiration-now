@@ -1,44 +1,40 @@
 import type { InspirationData } from "../types.ts";
 import { localQuotes } from "../data/quotes.ts";
-
-let lastQuoteIndex = -1;
-
-// Base URLs for external services
-const IMAGE_BASE_URL = "https://picsum.photos/800/1200";
-
-// Fallback data in case of API failures - Corrected URL
-const FALLBACK_IMAGE_URL = "https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=800&q=80";
+import { localImages } from "../data/images.ts";
 
 /**
- * Fetches a random image from Picsum Photos and pairs it with a local quote.
- * This function is designed to be resilient. If the image fetch fails, it uses a fallback image.
- * @returns A Promise that resolves to an InspirationData object.
+ * Fetches a new inspiration, consisting of a quote and a background image.
+ * The image is fetched from Picsum Photos, with a local fallback if the fetch fails.
+ * @returns A promise that resolves to an InspirationData object.
  */
 export const fetchNewInspiration = async (): Promise<InspirationData> => {
-  // 1. Get a random local quote, ensuring it's not the same as the last one.
-  let randomIndex;
-  do {
-    randomIndex = Math.floor(Math.random() * localQuotes.length);
-  } while (localQuotes.length > 1 && randomIndex === lastQuoteIndex);
-  lastQuoteIndex = randomIndex;
-  const { quote, author } = localQuotes[randomIndex];
+  // Get a random quote from the local array
+  const randomQuoteIndex = Math.floor(Math.random() * localQuotes.length);
+  const { quote, author } = localQuotes[randomQuoteIndex];
 
-  // 2. Try to fetch a new random image.
+  let imageUrl: string;
+
   try {
-    const imageResponse = await fetch(IMAGE_BASE_URL, { cache: "no-cache" });
-    if (!imageResponse.ok) {
-        throw new Error(`Failed to fetch image: ${imageResponse.statusText}`);
+    // Fetch a random image from Picsum Photos.
+    // The dimensions 800x1280 match the card's aspect ratio.
+    // A random parameter is added to prevent the browser from caching the image request.
+    const response = await fetch(`https://picsum.photos/800/1280?random=${Math.random()}`);
+    if (!response.ok) {
+        // If the response is not ok (e.g., 404, 500), throw an error to trigger the catch block.
+        throw new Error(`Picsum Photos request failed with status ${response.status}`);
     }
-    const imageBlob = await imageResponse.blob();
-    const imageUrl = URL.createObjectURL(imageBlob);
-    return { quote, author, imageUrl };
+    // The final URL after any redirects is the actual image URL we want to use.
+    imageUrl = response.url;
   } catch (error) {
-    // 3. If fetch fails, return the quote with a safe fallback image.
-    console.warn("Could not fetch new random image, using fallback.", error);
-    return {
-        quote,
-        author,
-        imageUrl: FALLBACK_IMAGE_URL,
-    };
+    console.warn("Failed to fetch image from Picsum Photos, using local fallback:", error);
+    // Fallback to a random local image if the fetch fails.
+    const randomImageIndex = Math.floor(Math.random() * localImages.length);
+    imageUrl = localImages[randomImageIndex];
   }
+
+  return {
+    quote,
+    author,
+    imageUrl,
+  };
 };
