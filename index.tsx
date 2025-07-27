@@ -192,7 +192,7 @@ const App: React.FC = () => {
       <div className="w-full flex-grow flex flex-col items-center justify-center">
         <header className="text-center mb-6 z-10">
             <p className="text-lg text-slate-600">
-            Your daily dose of motivation.
+            YOUR DAILY DOSE OF MOTIVATION.
             </p>
         </header>
         
