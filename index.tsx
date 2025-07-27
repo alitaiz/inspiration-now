@@ -13,6 +13,7 @@ interface InspirationData {
 interface QuoteCardProps {
   quote: string;
   imageUrl: string;
+  onRefresh: () => void;
 }
 
 interface ErrorDisplayProps {
@@ -104,7 +105,11 @@ const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ message }) => {
   );
 };
 
-const QuoteCard: React.FC<QuoteCardProps> = ({ quote, imageUrl }) => {
+
+
+const QuoteCard: React.FC<QuoteCardProps> = ({ quote, imageUrl, onRefresh }) => {
+
+
   const getFontSizeClass = (textLength: number): string => {
     if (textLength > 220) return 'text-xl';
     if (textLength > 150) return 'text-2xl';
@@ -114,7 +119,8 @@ const QuoteCard: React.FC<QuoteCardProps> = ({ quote, imageUrl }) => {
 
   return (
     <div
-      className="relative w-full h-full rounded-3xl shadow-2xl overflow-hidden bg-cover bg-center transition-all duration-700 ease-in-out animate-fade-in"
+      onClick={onRefresh}
+      className="relative w-full h-full rounded-3xl shadow-2xl overflow-hidden bg-cover bg-center transition-all duration-700 ease-in-out animate-fade-in cursor-pointer"
       style={{ backgroundImage: `url(${imageUrl})` }}
     >
       <div className="absolute inset-0 bg-black bg-opacity-40"></div>
@@ -136,26 +142,31 @@ const App: React.FC = () => {
   const [error, setError] = React.useState<string | null>(null);
   const [backgroundStyle, setBackgroundStyle] = React.useState<string>('');
   
+
+  const loadInspiration = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await fetchNewInspiration();
+      setInspiration(data);
+    } catch (err) {
+      console.error("An unexpected error occurred while loading inspiration:", err);
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      setInspiration(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   React.useEffect(() => {
     setBackgroundStyle(generateRandomGradient());
-
-    const loadInspiration = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const data = await fetchNewInspiration();
-        setInspiration(data);
-      } catch (err) {
-        console.error("An unexpected error occurred while loading inspiration:", err);
-        setError(err instanceof Error ? err.message : 'An unknown error occurred');
-        setInspiration(null);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
     loadInspiration();
   }, []);
+
+  const handleRefresh = () => {
+    setBackgroundStyle(generateRandomGradient());
+    loadInspiration();
+  };
 
   const renderContent = () => {
     if (isLoading) {
@@ -170,6 +181,7 @@ const App: React.FC = () => {
           key={inspiration.imageUrl}
           quote={inspiration.quote}
           imageUrl={inspiration.imageUrl}
+          onRefresh={handleRefresh}
         />
       );
     }

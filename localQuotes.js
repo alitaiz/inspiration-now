@@ -313,4 +313,5 @@ export const localQuotes = [
   { quote: "My peaceful nature grows as I release old fears and judgments." },
   { quote: "I trust life’s rhythm, knowing every moment brings growth and wisdom." },
   { quote: "Every encouraging thought I hold creates stronger confidence within." },
+  { quote: "I nurture hope and gratitude, knowing they inspire a future filled with joy." }
 ];
