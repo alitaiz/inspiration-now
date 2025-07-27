@@ -212,7 +212,7 @@ export const localQuotes = [
   { quote: "With gratitude, I ground myself in the present moment’s beauty." },
   { quote: "I release tension through mindful breaths, bringing serenity to my mind." },
   { quote: "I see hope in every step forward, choosing faith over worry." },
-  { quote: "My peaceful spirit invites healing for myself and others around me." }
+  { quote: "My peaceful spirit invites healing for myself and others around me." },
   { quote: "I breathe gratitude and allow positive thoughts to brighten my entire day." },
   { quote: "Through mindful pauses, I welcome peace and deeper compassion for myself." },
   { quote: "My gentle resilience helps me move forward with kindness and clear intention." },
